@@ -174,7 +174,7 @@ export function getRecentScores(username: string, last: number): number[] {
 export function recordTransaction(tx: Omit<Transaction, "explorerUrl" | "score" | "repo" | "prUrl"> & { scoreRedeemed?: number }): void {
   addTransaction({
     txHash: tx.txHash,
-    explorerUrl: `https://sepolia.basescan.org/tx/${tx.txHash}`,
+    explorerUrl: `${process.env.SOLANA_EXPLORER_BASE || "https://explorer.solana.com/tx"}/${tx.txHash}${process.env.SOLANA_CLUSTER_PARAM || ""}`,
     githubUsername: tx.githubUsername,
     walletAddress: tx.walletAddress,
     amountEth: tx.amountEth,

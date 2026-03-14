@@ -47,7 +47,7 @@ export function buildClaimComment(username: string, score: number, reasoning: st
 
 ${reasoning}
 
-Thanks for the contribution, @${username}. [Claim your reward](${claimUrl}) on Base Sepolia.
+Thanks for the contribution, @${username}. [Claim your reward](${claimUrl}) on Solana.
 
 ---
 
