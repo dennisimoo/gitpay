@@ -24,10 +24,10 @@ PR Description: ${pr.body?.slice(0, 600) || "(none)"}
 Stats: +${pr.additions} -${pr.deletions} lines across ${pr.changedFiles} files
 
 Files changed:
-${pr.files.slice(0, 10).map((f) => `- ${f.filename} (+${f.additions}/-${f.deletions})`).join("\n")}
+${pr.files.slice(0, 10).map((f) => `- ${f.filename} (+${f.additions}/-${f.deletions})${f.patch ? `\n${f.patch.slice(0, 300)}` : ""}`).join("\n\n")}
 
-Diff preview:
-${pr.diff.slice(0, 3000)}
+Full diff:
+${pr.diff.slice(0, 2500)}
 
 Scoring guide:
 - trivial (0-15): typo, whitespace, minor formatting
