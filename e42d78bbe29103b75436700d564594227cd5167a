@@ -1,0 +1,33 @@
+src/lib/db.ts
+  67fcfcd1402377fc 1-52
+src/app/api/github/callback/route.ts
+  67fcfcd1402377fc 3,27
+src/app/api/github/repos/route.ts
+  67fcfcd1402377fc 2,6-9,11,14-15,21,32
+Dockerfile
+  67fcfcd1402377fc 3,9,16,26-28
+package.json
+  67fcfcd1402377fc 17,22
+src/lib/store.ts
+  67fcfcd1402377fc 1,32-48,51-63,66-74,79-80,84-86,90-96,101-102,105-109,112,130-131,133,148,160-164,168-171,187-208
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "e42d78bbe29103b75436700d564594227cd5167a",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 172,
+      "total_deletions": 51,
+      "accepted_lines": 170,
+      "overriden_lines": 0
+    }
+  }
+}
