@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrigin } from "@/lib/origin";
+import { kvSet } from "@/lib/store";
 
 const g = global as typeof global & { _githubToken?: string };
 
@@ -22,8 +23,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${getOrigin(req)}/setup?error=oauth_failed`);
   }
 
-  // Store in global memory for this session
   g._githubToken = data.access_token;
+  kvSet("github_token", data.access_token);
 
   return NextResponse.redirect(`${getOrigin(req)}/setup?connected=1`);
 }
