@@ -120,6 +120,21 @@ export function getTreasuryStats() {
   return getStats();
 }
 
+export function getRecentContributionCount(username: string, windowMs: number): number {
+  const cutoff = Date.now() - windowMs;
+  return Array.from(g._claims.values()).filter(
+    (c) => c.githubUsername === username && new Date(c.createdAt).getTime() > cutoff
+  ).length;
+}
+
+export function getRecentScores(username: string, last: number): number[] {
+  return Array.from(g._claims.values())
+    .filter((c) => c.githubUsername === username)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, last)
+    .map((c) => c.score);
+}
+
 export function recordTransaction(tx: Omit<Transaction, "explorerUrl" | "score" | "repo" | "prUrl"> & { scoreRedeemed?: number }): void {
   addTransaction({
     txHash: tx.txHash,

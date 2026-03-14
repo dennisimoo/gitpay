@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const { repoFullName } = await req.json() as { repoFullName: string };
   if (!repoFullName) return NextResponse.json({ error: "repoFullName required" }, { status: 400 });
 
-  const token = g._githubToken || process.env.GITHUB_TOKEN;
+  const token = g._githubToken;
   if (!token) return NextResponse.json({ error: "Not authenticated with GitHub" }, { status: 401 });
 
   const [owner, repo] = repoFullName.split("/");
@@ -70,7 +70,7 @@ export async function DELETE(req: NextRequest) {
   const { repoFullName } = await req.json() as { repoFullName: string };
   if (!repoFullName) return NextResponse.json({ error: "repoFullName required" }, { status: 400 });
 
-  const token = g._githubToken || process.env.GITHUB_TOKEN;
+  const token = g._githubToken;
   if (!token) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const [owner, repo] = repoFullName.split("/");

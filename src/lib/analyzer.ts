@@ -1,5 +1,10 @@
 import { Octokit } from "@octokit/rest";
 
+const g = global as typeof global & { _githubToken?: string };
+function getOctokit() {
+  return new Octokit({ auth: g._githubToken });
+}
+
 export interface ContributionObject {
   contributor: string;
   eventType: string;
@@ -7,8 +12,6 @@ export interface ContributionObject {
   rawUrl: string;
   complexitySignals: Record<string, unknown>;
 }
-
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
 export async function analyze(
   eventType: string,
@@ -47,7 +50,7 @@ async function analyzePR(payload: Record<string, unknown>): Promise<Contribution
   let filePaths: string[] = [];
   try {
     const [owner, repoName] = repo.split("/");
-    const { data } = await octokit.pulls.listFiles({
+    const { data } = await getOctokit().pulls.listFiles({
       owner,
       repo: repoName,
       pull_number: pr.number as number,

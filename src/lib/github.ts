@@ -1,10 +1,13 @@
 import { Octokit } from "@octokit/rest";
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const g = global as typeof global & { _githubToken?: string };
+function getOctokit() {
+  return new Octokit({ auth: g._githubToken });
+}
 
 export async function getPRDiff(owner: string, repo: string, pullNumber: number): Promise<string> {
   try {
-    const { data } = await octokit.pulls.get({
+    const { data } = await getOctokit().pulls.get({
       owner, repo, pull_number: pullNumber,
       mediaType: { format: "diff" },
     });
@@ -17,7 +20,7 @@ export async function getPRDiff(owner: string, repo: string, pullNumber: number)
 
 export async function getPRFiles(owner: string, repo: string, pullNumber: number) {
   try {
-    const { data } = await octokit.pulls.listFiles({
+    const { data } = await getOctokit().pulls.listFiles({
       owner, repo, pull_number: pullNumber, per_page: 30,
     });
     return data.map((f) => ({
@@ -38,7 +41,7 @@ export async function postPRComment(
   pullNumber: number,
   body: string
 ): Promise<void> {
-  await octokit.issues.createComment({
+  await getOctokit().issues.createComment({
     owner, repo, issue_number: pullNumber, body,
   });
 }
@@ -50,20 +53,20 @@ export function buildClaimComment(
   category: string,
   claimUrl: string
 ): string {
-  const emoji = score >= 70 ? "🏆" : score >= 40 ? "⭐" : "✅";
   const label = category.replace("_", " ");
 
-  return `## ${emoji} GitPay AI Review
+  return `**GitPay** reviewed this pull request.
 
-**Score: ${score}/100** · ${label}
+| | |
+|---|---|
+| Score | **${score} / 100** |
+| Category | ${label} |
 
-> ${reasoning}
+${reasoning}
+
+Thanks for the contribution, @${username}. [Claim your reward](${claimUrl}) on Base Sepolia.
 
 ---
 
-Hey @${username} — your contribution has been reviewed and scored by AI. If your score is ≥ 25, you can claim an ETH reward on Base Sepolia:
-
-**[→ Claim your reward](${claimUrl})**
-
-*Powered by [GitPay](${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}) · AI scoring by Gemini · Payouts on Base Sepolia*`;
+<sub>Scored by Gemini · Paid out by GitPay</sub>`;
 }

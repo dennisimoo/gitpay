@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const g = global as typeof global & { _githubToken?: string };
 
 export async function GET() {
-  const token = g._githubToken || process.env.GITHUB_TOKEN;
+  const token = g._githubToken;
   if (!token) return NextResponse.json({ repos: [], connected: false });
 
   const allRepos: Array<{ full_name: string; private: boolean; description: string | null }> = [];
