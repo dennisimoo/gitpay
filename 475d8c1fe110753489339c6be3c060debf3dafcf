@@ -1,0 +1,35 @@
+src/components/Sidebar.tsx
+  67fcfcd1402377fc 46
+src/app/api/github/signout/route.ts
+  67fcfcd1402377fc 1-23
+src/app/(app)/setup/page.tsx
+  67fcfcd1402377fc 97,161-162,164-173,175-177
+src/app/(app)/prs/page.tsx
+  67fcfcd1402377fc 67,69
+src/app/icon.tsx
+  67fcfcd1402377fc 1-31
+src/app/(app)/transactions/page.tsx
+  67fcfcd1402377fc 56,58,136
+src/app/(app)/page.tsx
+  67fcfcd1402377fc 89,94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "475d8c1fe110753489339c6be3c060debf3dafcf",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 80,
+      "total_deletions": 19,
+      "accepted_lines": 78,
+      "overriden_lines": 0
+    }
+  }
+}
