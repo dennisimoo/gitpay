@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { getDb } from "./db";
 
 export interface Claim {
   token: string;
@@ -63,7 +63,7 @@ function rowToTx(r: Record<string, unknown>): Transaction {
 }
 
 export function addClaim(claim: Claim): void {
-  db.prepare(`
+  getDb().prepare(`
     INSERT OR REPLACE INTO claims
     (token, github_username, repo, pr_number, pr_url, pr_title, score, reasoning, category, wallet_address, claimed, tx_hash, explorer_url, created_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -76,18 +76,18 @@ export function addClaim(claim: Claim): void {
 }
 
 export function getClaim(token: string): Claim | undefined {
-  const row = db.prepare("SELECT * FROM claims WHERE token = ?").get(token);
+  const row = getDb().prepare("SELECT * FROM claims WHERE token = ?").get(token);
   return row ? rowToClaim(row as Record<string, unknown>) : undefined;
 }
 
 export function markClaimed(token: string, walletAddress: string, txHash: string, explorerUrl: string): void {
-  db.prepare(`
+  getDb().prepare(`
     UPDATE claims SET claimed = 1, wallet_address = ?, tx_hash = ?, explorer_url = ? WHERE token = ?
   `).run(walletAddress, txHash, explorerUrl, token);
 }
 
 export function addTransaction(tx: Transaction): void {
-  db.prepare(`
+  getDb().prepare(`
     INSERT OR REPLACE INTO transactions
     (tx_hash, explorer_url, github_username, wallet_address, amount_eth, score, repo, pr_url, timestamp)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -98,13 +98,13 @@ export function addTransaction(tx: Transaction): void {
 }
 
 export function getAllClaims(): Claim[] {
-  const rows = db.prepare("SELECT * FROM claims ORDER BY created_at DESC").all();
+  const rows = getDb().prepare("SELECT * FROM claims ORDER BY created_at DESC").all();
   return rows.map((r) => rowToClaim(r as Record<string, unknown>));
 }
 
 export const transactions = {
   get all() {
-    return db.prepare("SELECT * FROM transactions ORDER BY timestamp DESC").all().map((r) => rowToTx(r as Record<string, unknown>));
+    return getDb().prepare("SELECT * FROM transactions ORDER BY timestamp DESC").all().map((r) => rowToTx(r as Record<string, unknown>));
   }
 };
 
@@ -128,7 +128,7 @@ export interface LeaderboardEntry {
 
 export function getLeaderboard(): LeaderboardEntry[] {
   const all = getAllClaims();
-  const txs = db.prepare("SELECT * FROM transactions").all().map((r) => rowToTx(r as Record<string, unknown>));
+  const txs = getDb().prepare("SELECT * FROM transactions").all().map((r) => rowToTx(r as Record<string, unknown>));
   const map = new Map<string, LeaderboardEntry>();
   for (const claim of all) {
     const existing = map.get(claim.githubUsername);
@@ -158,14 +158,14 @@ export function getTreasuryStats() {
 
 export function getRecentContributionCount(username: string, windowMs: number): number {
   const cutoff = new Date(Date.now() - windowMs).toISOString();
-  const row = db.prepare(
+  const row = getDb().prepare(
     "SELECT COUNT(*) as cnt FROM claims WHERE github_username = ? AND created_at > ?"
   ).get(username, cutoff) as { cnt: number };
   return row.cnt;
 }
 
 export function getRecentScores(username: string, last: number): number[] {
-  const rows = db.prepare(
+  const rows = getDb().prepare(
     "SELECT score FROM claims WHERE github_username = ? ORDER BY created_at DESC LIMIT ?"
   ).all(username, last) as { score: number }[];
   return rows.map((r) => r.score);
@@ -187,29 +187,29 @@ export function recordTransaction(tx: Omit<Transaction, "explorerUrl" | "score" 
 
 // KV helpers for github token
 export function kvSet(key: string, value: string): void {
-  db.prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)").run(key, value);
+  getDb().prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)").run(key, value);
 }
 
 export function kvGet(key: string): string | undefined {
-  const row = db.prepare("SELECT value FROM kv WHERE key = ?").get(key) as { value: string } | undefined;
+  const row = getDb().prepare("SELECT value FROM kv WHERE key = ?").get(key) as { value: string } | undefined;
   return row?.value;
 }
 
 // Connected repos (session-scoped)
 export function getConnectedRepos(sessionId: string): string[] {
-  return (db.prepare("SELECT repo_full_name FROM connected_repos_v2 WHERE session_id = ?").all(sessionId) as { repo_full_name: string }[]).map((r) => r.repo_full_name);
+  return (getDb().prepare("SELECT repo_full_name FROM connected_repos_v2 WHERE session_id = ?").all(sessionId) as { repo_full_name: string }[]).map((r) => r.repo_full_name);
 }
 
 export function addConnectedRepo(repoFullName: string, sessionId: string): void {
-  db.prepare("INSERT OR IGNORE INTO connected_repos_v2 (repo_full_name, session_id) VALUES (?, ?)").run(repoFullName, sessionId);
+  getDb().prepare("INSERT OR IGNORE INTO connected_repos_v2 (repo_full_name, session_id) VALUES (?, ?)").run(repoFullName, sessionId);
 }
 
 export function removeConnectedRepo(repoFullName: string, sessionId: string): void {
-  db.prepare("DELETE FROM connected_repos_v2 WHERE repo_full_name = ? AND session_id = ?").run(repoFullName, sessionId);
+  getDb().prepare("DELETE FROM connected_repos_v2 WHERE repo_full_name = ? AND session_id = ?").run(repoFullName, sessionId);
 }
 
 export function getTokenForRepo(repoFullName: string): string | undefined {
-  const row = db.prepare("SELECT session_id FROM connected_repos_v2 WHERE repo_full_name = ? LIMIT 1").get(repoFullName) as { session_id: string } | undefined;
+  const row = getDb().prepare("SELECT session_id FROM connected_repos_v2 WHERE repo_full_name = ? LIMIT 1").get(repoFullName) as { session_id: string } | undefined;
   if (!row) return undefined;
   return kvGet(`github_token:${row.session_id}`);
 }
