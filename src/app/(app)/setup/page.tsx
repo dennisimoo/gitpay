@@ -160,7 +160,7 @@ function SetupContent() {
                     <div style={{ fontSize: "12px", color: "#71717a" }}>{repos.length} repositories found</div>
                   </div>
                   <button
-                    onClick={loadRepos}
+                    onClick={() => loadRepos()}
                     style={{ marginLeft: "auto", padding: "5px 12px", border: "1px solid #e4e4e7", borderRadius: "6px", background: "#fff", fontSize: "12px", color: "#71717a", cursor: "pointer", fontFamily: "inherit" }}
                   >
                     Refresh
