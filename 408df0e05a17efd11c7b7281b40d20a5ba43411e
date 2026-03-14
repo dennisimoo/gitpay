@@ -1,0 +1,29 @@
+src/app/api/claim/[token]/route.ts
+  67fcfcd1402377fc 26-27,30-31,33-34,38
+src/app/claim/[token]/page.tsx
+  67fcfcd1402377fc 23-24,27-28,52-53,94,101-106,126,156-157,160,163,166-167,177-178,183,189,192-193,213,216,220,228
+src/lib/treasury.ts
+  67fcfcd1402377fc 2-9,12,14-16,18-20,22,24-26,35-41,43,47-57,65,77,83,86,91,98,100,103
+.gitignore
+  67fcfcd1402377fc 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "408df0e05a17efd11c7b7281b40d20a5ba43411e",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 93,
+      "total_deletions": 96,
+      "accepted_lines": 88,
+      "overriden_lines": 0
+    }
+  }
+}
