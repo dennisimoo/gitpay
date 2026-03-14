@@ -83,3 +83,53 @@ export function getStats() {
     avgScore: all.length ? Math.round(all.reduce((s, c) => s + c.score, 0) / all.length) : 0,
   };
 }
+
+export interface LeaderboardEntry {
+  githubUsername: string;
+  totalScore: number;
+  totalPaidOut: number;
+  walletAddress?: string;
+  flagged: boolean;
+}
+
+export function getLeaderboard(): LeaderboardEntry[] {
+  const map = new Map<string, LeaderboardEntry>();
+  for (const claim of g._claims.values()) {
+    const existing = map.get(claim.githubUsername);
+    if (existing) {
+      existing.totalScore += claim.score;
+      if (claim.walletAddress) existing.walletAddress = claim.walletAddress;
+    } else {
+      map.set(claim.githubUsername, {
+        githubUsername: claim.githubUsername,
+        totalScore: claim.score,
+        totalPaidOut: 0,
+        walletAddress: claim.walletAddress,
+        flagged: false,
+      });
+    }
+  }
+  for (const tx of g._transactions) {
+    const entry = map.get(tx.githubUsername);
+    if (entry) entry.totalPaidOut += parseFloat(tx.amountEth) * 1000;
+  }
+  return Array.from(map.values()).sort((a, b) => b.totalScore - a.totalScore);
+}
+
+export function getTreasuryStats() {
+  return getStats();
+}
+
+export function recordTransaction(tx: Omit<Transaction, "explorerUrl" | "score" | "repo" | "prUrl"> & { scoreRedeemed?: number }): void {
+  addTransaction({
+    txHash: tx.txHash,
+    explorerUrl: `https://sepolia.basescan.org/tx/${tx.txHash}`,
+    githubUsername: tx.githubUsername,
+    walletAddress: tx.walletAddress,
+    amountEth: tx.amountEth,
+    score: tx.scoreRedeemed ?? 0,
+    repo: "",
+    prUrl: "",
+    timestamp: tx.timestamp,
+  });
+}

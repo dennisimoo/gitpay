@@ -47,11 +47,11 @@ export async function POST(req: NextRequest) {
   }
 
   // Process async so GitHub doesn't time out
-  handlePR(payload).catch(console.error);
+  handlePR(payload, req.nextUrl.origin).catch(console.error);
   return NextResponse.json({ ok: true });
 }
 
-async function handlePR(payload: Record<string, unknown>) {
+async function handlePR(payload: Record<string, unknown>, appUrl: string) {
   const pr = payload.pull_request as Record<string, unknown>;
   const repoData = payload.repository as Record<string, unknown>;
   const repoFullName = repoData.full_name as string;
@@ -88,7 +88,6 @@ async function handlePR(payload: Record<string, unknown>) {
 
   // Create a unique claim token
   const token = randomUUID();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const claimUrl = `${appUrl}/claim/${token}`;
 
   // Store the claim

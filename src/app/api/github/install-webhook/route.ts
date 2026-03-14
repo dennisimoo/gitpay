@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   if (!token) return NextResponse.json({ error: "Not authenticated with GitHub" }, { status: 401 });
 
   const [owner, repo] = repoFullName.split("/");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = req.nextUrl.origin;
   const secret = process.env.GITHUB_WEBHOOK_SECRET || "gitpay-secret-2024";
 
   // Check if webhook already exists
@@ -74,7 +74,7 @@ export async function DELETE(req: NextRequest) {
   if (!token) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const [owner, repo] = repoFullName.split("/");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = req.nextUrl.origin;
 
   const listRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/hooks`, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
