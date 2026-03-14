@@ -131,9 +131,23 @@ export default function Overview() {
               <p style={{ fontSize: "14px", fontWeight: 500, color: "#000", marginBottom: "6px" }}>
                 No pull requests reviewed yet
               </p>
-              <p style={{ fontSize: "13px", color: "#71717a", maxWidth: "360px", margin: "0 auto" }}>
-                Set up the webhook in your GitHub repo. When a PR is opened, the bot will review the code and post a claim link automatically.
+              <p style={{ fontSize: "13px", color: "#71717a", maxWidth: "360px", margin: "0 auto 16px" }}>
+                Connect a repository, then open a pull request. GitPay will review the code and post a claim link as a comment.
               </p>
+              <a
+                href="/setup"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  padding: "7px 16px", background: "#000", color: "#fff",
+                  borderRadius: "7px", fontSize: "13px", fontWeight: 500,
+                  textDecoration: "none",
+                }}
+              >
+                Connect a repository
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <path d="M5 3l4 3-4 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
             </div>
           ) : (
             <div style={{ border: "1px solid #e4e4e7", borderRadius: "12px", overflow: "hidden" }}>

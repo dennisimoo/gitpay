@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getOrigin } from "@/lib/origin";
 
 const g = global as typeof global & { _githubToken?: string };
 
@@ -18,11 +19,11 @@ export async function GET(req: NextRequest) {
 
   const data = await res.json() as { access_token?: string; error?: string };
   if (!data.access_token) {
-    return NextResponse.redirect(`${req.nextUrl.origin}/setup?error=oauth_failed`);
+    return NextResponse.redirect(`${getOrigin(req)}/setup?error=oauth_failed`);
   }
 
   // Store in global memory for this session
   g._githubToken = data.access_token;
 
-  return NextResponse.redirect(`${req.nextUrl.origin}/setup?connected=1`);
+  return NextResponse.redirect(`${getOrigin(req)}/setup?connected=1`);
 }

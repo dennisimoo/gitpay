@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual, randomUUID } from "crypto";
+import { getOrigin } from "@/lib/origin";
 import { NextRequest, NextResponse } from "next/server";
 import { getPRDiff, getPRFiles, postPRComment, buildClaimComment } from "@/lib/github";
 import { scorePR } from "@/lib/scorer";
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Process async so GitHub doesn't time out
-  handlePR(payload, req.nextUrl.origin).catch(console.error);
+  handlePR(payload, getOrigin(req)).catch(console.error);
   return NextResponse.json({ ok: true });
 }
 

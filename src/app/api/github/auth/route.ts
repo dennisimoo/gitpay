@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getOrigin } from "@/lib/origin";
 
 export async function GET(req: NextRequest) {
   const clientId = process.env.GITHUB_CLIENT_ID;
@@ -6,7 +7,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "GITHUB_CLIENT_ID not set" }, { status: 500 });
   }
 
-  const origin = req.nextUrl.origin;
+  const origin = getOrigin(req);
   const state = Math.random().toString(36).slice(2);
   const params = new URLSearchParams({
     client_id: clientId,
