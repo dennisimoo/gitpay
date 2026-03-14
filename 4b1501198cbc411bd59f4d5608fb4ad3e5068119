@@ -1,0 +1,25 @@
+src/lib/db.ts
+  67fcfcd1402377fc 10,15,53-55
+src/lib/store.ts
+  67fcfcd1402377fc 1,66,79,84,90,101,107,131,161,168,190,194,200,204,208,212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "4b1501198cbc411bd59f4d5608fb4ad3e5068119",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 69,
+      "total_deletions": 67,
+      "accepted_lines": 21,
+      "overriden_lines": 0
+    }
+  }
+}
