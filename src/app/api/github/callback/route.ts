@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrigin } from "@/lib/origin";
+import { ensureSessionCookie, getSessionId } from "@/lib/session";
 import { kvSet } from "@/lib/store";
-
-const g = global as typeof global & { _githubToken?: string };
 
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get("code");
-  if (!code) return NextResponse.redirect("/setup?error=no_code");
+  const origin = getOrigin(req);
+  if (!code) return NextResponse.redirect(`${origin}/setup?error=no_code`);
 
   const res = await fetch("https://github.com/login/oauth/access_token", {
     method: "POST",
@@ -20,11 +20,12 @@ export async function GET(req: NextRequest) {
 
   const data = await res.json() as { access_token?: string; error?: string };
   if (!data.access_token) {
-    return NextResponse.redirect(`${getOrigin(req)}/setup?error=oauth_failed`);
+    return NextResponse.redirect(`${origin}/setup?error=oauth_failed`);
   }
 
-  g._githubToken = data.access_token;
-  kvSet("github_token", data.access_token);
+  const redirect = NextResponse.redirect(`${origin}/setup?connected=1`);
+  const sid = ensureSessionCookie(req, redirect);
+  kvSet(`github_token:${sid}`, data.access_token);
 
-  return NextResponse.redirect(`${getOrigin(req)}/setup?connected=1`);
+  return redirect;
 }

@@ -40,7 +40,9 @@ if (!g._db) {
       timestamp TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS connected_repos (
-      repo_full_name TEXT PRIMARY KEY
+      repo_full_name TEXT NOT NULL,
+      session_id TEXT NOT NULL,
+      PRIMARY KEY (repo_full_name, session_id)
     );
     CREATE TABLE IF NOT EXISTS kv (
       key TEXT PRIMARY KEY,

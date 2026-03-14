@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrigin } from "@/lib/origin";
+import { ensureSessionCookie } from "@/lib/session";
 
 export async function GET(req: NextRequest) {
   const clientId = process.env.GITHUB_CLIENT_ID;
@@ -8,13 +9,14 @@ export async function GET(req: NextRequest) {
   }
 
   const origin = getOrigin(req);
-  const state = Math.random().toString(36).slice(2);
-  const params = new URLSearchParams({
+  const res = NextResponse.redirect(`https://github.com/login/oauth/authorize?${new URLSearchParams({
     client_id: clientId,
     scope: "repo admin:repo_hook",
-    state,
+    state: Math.random().toString(36).slice(2),
     redirect_uri: `${origin}/api/github/callback`,
-  });
+  })}`);
 
-  return NextResponse.redirect(`https://github.com/login/oauth/authorize?${params}`);
+  // Ensure session cookie exists before redirect so callback can read it
+  ensureSessionCookie(req, res);
+  return res;
 }

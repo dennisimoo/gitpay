@@ -3,7 +3,7 @@ import { getOrigin } from "@/lib/origin";
 import { NextRequest, NextResponse } from "next/server";
 import { getPRDiff, getPRFiles, postPRComment, buildClaimComment } from "@/lib/github";
 import { scorePR } from "@/lib/scorer";
-import { addClaim } from "@/lib/store";
+import { addClaim, getTokenForRepo } from "@/lib/store";
 import { emitEvent } from "@/lib/events";
 
 export const runtime = "nodejs";
@@ -68,10 +68,12 @@ async function handlePR(payload: Record<string, unknown>, appUrl: string) {
 
   console.log(`[webhook] PR #${prNumber} "${prTitle}" by @${username} in ${repoFullName}`);
 
+  const repoToken = getTokenForRepo(repoFullName);
+
   // Fetch diff and file list
   const [diff, files] = await Promise.all([
-    getPRDiff(owner, repoName, prNumber),
-    getPRFiles(owner, repoName, prNumber),
+    getPRDiff(owner, repoName, prNumber, repoToken),
+    getPRFiles(owner, repoName, prNumber, repoToken),
   ]);
 
   // Score with Gemini via Replicate
@@ -117,7 +119,7 @@ async function handlePR(payload: Record<string, unknown>, appUrl: string) {
       claimUrl
     );
     try {
-      await postPRComment(owner, repoName, prNumber, commentBody);
+      await postPRComment(owner, repoName, prNumber, commentBody, repoToken);
       console.log(`[webhook] Commented on PR #${prNumber} with claim link`);
     } catch (err) {
       console.error("[webhook] Failed to post comment:", err);

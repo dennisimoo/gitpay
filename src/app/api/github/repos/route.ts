@@ -1,18 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { kvGet } from "@/lib/store";
+import { getSessionId } from "@/lib/session";
 
-const g = global as typeof global & { _githubToken?: string };
-
-function getToken(): string | undefined {
-  return g._githubToken || kvGet("github_token");
-}
-
-export async function GET() {
-  const token = getToken();
+export async function GET(req: NextRequest) {
+  const sid = getSessionId(req);
+  const token = sid ? kvGet(`github_token:${sid}`) : undefined;
   if (!token) return NextResponse.json({ repos: [], connected: false });
-
-  // Cache in memory for this process
-  if (!g._githubToken) g._githubToken = token;
 
   const allRepos: Array<{ full_name: string; private: boolean; description: string | null }> = [];
   let page = 1;
