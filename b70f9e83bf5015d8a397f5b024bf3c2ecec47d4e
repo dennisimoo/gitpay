@@ -1,0 +1,25 @@
+start.sh
+  67fcfcd1402377fc 1-25
+Dockerfile
+  67fcfcd1402377fc 14,16-21,29-30,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "b70f9e83bf5015d8a397f5b024bf3c2ecec47d4e",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 47,
+      "total_deletions": 19,
+      "accepted_lines": 35,
+      "overriden_lines": 0
+    }
+  }
+}
