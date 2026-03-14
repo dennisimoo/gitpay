@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getRecentContributions } from "@/lib/store";
+import { getAllClaims } from "@/lib/store";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json(getRecentContributions(50));
+  return NextResponse.json(getAllClaims().slice(0, 50));
 }
