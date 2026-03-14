@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrigin } from "@/lib/origin";
+import { kvGet, addConnectedRepo, removeConnectedRepo, getConnectedRepos } from "@/lib/store";
 
-const g = global as typeof global & {
-  _githubToken?: string;
-  _connectedRepos: Set<string>;
-};
+const g = global as typeof global & { _githubToken?: string };
 
-if (!g._connectedRepos) g._connectedRepos = new Set();
+function getToken(): string | undefined {
+  return g._githubToken || kvGet("github_token");
+}
 
 export async function POST(req: NextRequest) {
   const { repoFullName } = await req.json() as { repoFullName: string };
   if (!repoFullName) return NextResponse.json({ error: "repoFullName required" }, { status: 400 });
 
-  const token = g._githubToken;
+  const token = getToken();
   if (!token) return NextResponse.json({ error: "Not authenticated with GitHub" }, { status: 401 });
 
   const [owner, repo] = repoFullName.split("/");
   const appUrl = getOrigin(req);
   const secret = process.env.GITHUB_WEBHOOK_SECRET || "gitpay-secret-2024";
 
-  // Check if webhook already exists
   const listRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/hooks`, {
     headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" },
   });
@@ -28,12 +27,11 @@ export async function POST(req: NextRequest) {
     const hooks = await listRes.json() as Array<{ config: { url: string }; id: number }>;
     const existing = hooks.find((h) => h.config.url === `${appUrl}/api/webhook`);
     if (existing) {
-      g._connectedRepos.add(repoFullName);
+      addConnectedRepo(repoFullName);
       return NextResponse.json({ ok: true, alreadyExists: true });
     }
   }
 
-  // Install new webhook
   const createRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/hooks`, {
     method: "POST",
     headers: {
@@ -45,12 +43,7 @@ export async function POST(req: NextRequest) {
       name: "web",
       active: true,
       events: ["pull_request"],
-      config: {
-        url: `${appUrl}/api/webhook`,
-        content_type: "json",
-        secret,
-        insecure_ssl: "0",
-      },
+      config: { url: `${appUrl}/api/webhook`, content_type: "json", secret, insecure_ssl: "0" },
     }),
   });
 
@@ -59,19 +52,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: JSON.stringify(err) }, { status: createRes.status });
   }
 
-  g._connectedRepos.add(repoFullName);
+  addConnectedRepo(repoFullName);
   return NextResponse.json({ ok: true });
 }
 
 export async function GET() {
-  return NextResponse.json({ repos: Array.from(g._connectedRepos) });
+  return NextResponse.json({ repos: getConnectedRepos() });
 }
 
 export async function DELETE(req: NextRequest) {
   const { repoFullName } = await req.json() as { repoFullName: string };
   if (!repoFullName) return NextResponse.json({ error: "repoFullName required" }, { status: 400 });
 
-  const token = g._githubToken;
+  const token = getToken();
   if (!token) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
   const [owner, repo] = repoFullName.split("/");
@@ -92,6 +85,6 @@ export async function DELETE(req: NextRequest) {
     }
   }
 
-  g._connectedRepos.delete(repoFullName);
+  removeConnectedRepo(repoFullName);
   return NextResponse.json({ ok: true });
 }

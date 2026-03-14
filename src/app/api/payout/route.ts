@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { triggerPayoutRound } from "@/lib/treasury";
 import { emitEvent } from "@/lib/events";
-import { transactions } from "@/lib/store";
 
 export const runtime = "nodejs";
 
