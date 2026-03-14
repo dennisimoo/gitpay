@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:            #ffffff;
+  --bg-secondary:  #fafafa;
+  --bg-tertiary:   #f4f4f5;
+  --border:        #e4e4e7;
+  --border-strong: #d4d4d8;
+  --text:          #000000;
+  --text-secondary:#3f3f46;
+  --text-muted:    #71717a;
+  --accent:        #000000;
+  --accent-hover:  #27272a;
+  --accent-fg:     #ffffff;
+  --green:         #10b981;
+  --green-light:   #ecfdf5;
+  --red:           #ef4444;
+  --red-light:     #fef2f2;
+  --amber:         #f59e0b;
+  --amber-light:   #fffbeb;
+  --blue:          #3b82f6;
+  --blue-light:    #eff6ff;
+  --sidebar-w:     240px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .mono {
+  font-family: 'Geist Mono', 'SF Mono', monospace;
+  font-size: 13px;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in  { animation: fadeIn 0.2s ease-out forwards; }
+.slide-down  { animation: slideDown 0.3s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.8s linear infinite; }
+
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+.live-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+
+/* Score badge colors */
+.score-high   { color: var(--green); }
+.score-mid    { color: var(--amber); }
+.score-low    { color: var(--text-muted); }
