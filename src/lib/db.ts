@@ -39,7 +39,7 @@ if (!g._db) {
       pr_url TEXT NOT NULL DEFAULT '',
       timestamp TEXT NOT NULL
     );
-    CREATE TABLE IF NOT EXISTS connected_repos (
+    CREATE TABLE IF NOT EXISTS connected_repos_v2 (
       repo_full_name TEXT NOT NULL,
       session_id TEXT NOT NULL,
       PRIMARY KEY (repo_full_name, session_id)

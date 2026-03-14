@@ -197,19 +197,19 @@ export function kvGet(key: string): string | undefined {
 
 // Connected repos (session-scoped)
 export function getConnectedRepos(sessionId: string): string[] {
-  return (db.prepare("SELECT repo_full_name FROM connected_repos WHERE session_id = ?").all(sessionId) as { repo_full_name: string }[]).map((r) => r.repo_full_name);
+  return (db.prepare("SELECT repo_full_name FROM connected_repos_v2 WHERE session_id = ?").all(sessionId) as { repo_full_name: string }[]).map((r) => r.repo_full_name);
 }
 
 export function addConnectedRepo(repoFullName: string, sessionId: string): void {
-  db.prepare("INSERT OR IGNORE INTO connected_repos (repo_full_name, session_id) VALUES (?, ?)").run(repoFullName, sessionId);
+  db.prepare("INSERT OR IGNORE INTO connected_repos_v2 (repo_full_name, session_id) VALUES (?, ?)").run(repoFullName, sessionId);
 }
 
 export function removeConnectedRepo(repoFullName: string, sessionId: string): void {
-  db.prepare("DELETE FROM connected_repos WHERE repo_full_name = ? AND session_id = ?").run(repoFullName, sessionId);
+  db.prepare("DELETE FROM connected_repos_v2 WHERE repo_full_name = ? AND session_id = ?").run(repoFullName, sessionId);
 }
 
 export function getTokenForRepo(repoFullName: string): string | undefined {
-  const row = db.prepare("SELECT session_id FROM connected_repos WHERE repo_full_name = ? LIMIT 1").get(repoFullName) as { session_id: string } | undefined;
+  const row = db.prepare("SELECT session_id FROM connected_repos_v2 WHERE repo_full_name = ? LIMIT 1").get(repoFullName) as { session_id: string } | undefined;
   if (!row) return undefined;
   return kvGet(`github_token:${row.session_id}`);
 }
