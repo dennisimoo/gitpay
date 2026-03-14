@@ -1,0 +1,25 @@
+src/app/api/transactions/route.ts
+  67fcfcd1402377fc 7
+src/app/api/github/install-webhook/route.ts
+  67fcfcd1402377fc 3,5,7-9,15,30,46,55,60,67,88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "279ff7064c06c777efc5f5a19e90b80d72a67cd7",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 13,
+      "total_deletions": 21,
+      "accepted_lines": 13,
+      "overriden_lines": 0
+    }
+  }
+}
