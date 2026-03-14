@@ -43,6 +43,7 @@ export default function Sidebar() {
         alignItems: "center",
         gap: "10px",
         marginBottom: "32px",
+        paddingLeft: "12px",
       }}>
         <GitPayLogo />
         <span style={{ fontWeight: 600, fontSize: "15px", color: "#000", letterSpacing: "-0.01em" }}>

@@ -63,11 +63,10 @@ export default function PRsPage() {
 
   return (
     <>
-      <Topbar />
       <div style={{ flex: 1, overflowY: "auto", padding: "0 40px 48px" }}>
-        <div style={{ marginBottom: "24px", marginTop: "12px" }}>
+        <div style={{ marginBottom: "24px", marginTop: "32px" }}>
           <h1 style={{ fontSize: "22px", fontWeight: 600, color: "#000", marginBottom: "6px" }}>Pull Requests</h1>
-          <p style={{ fontSize: "13px", color: "#71717a" }}>Every PR reviewed by AI. Contributors can claim ETH for their work.</p>
+          <p style={{ fontSize: "13px", color: "#71717a" }}>Every PR reviewed by AI. Contributors can claim SOL for their work.</p>
         </div>
 
         {/* Filter tabs */}

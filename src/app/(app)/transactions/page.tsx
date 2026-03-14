@@ -52,11 +52,10 @@ export default function TransactionsPage() {
 
   return (
     <>
-      <Topbar />
       <div style={{ flex: 1, overflowY: "auto", padding: "0 40px 48px" }}>
-        <div style={{ marginBottom: "24px", marginTop: "12px" }}>
+        <div style={{ marginBottom: "24px", marginTop: "32px" }}>
           <h1 style={{ fontSize: "22px", fontWeight: 600, color: "#000", marginBottom: "6px" }}>Transactions</h1>
-          <p style={{ fontSize: "13px", color: "#71717a" }}>On-chain payouts sent on Base Sepolia testnet.</p>
+          <p style={{ fontSize: "13px", color: "#71717a" }}>On-chain payouts sent on Solana.</p>
         </div>
 
         <div style={{ maxWidth: "800px" }}>
@@ -134,7 +133,7 @@ export default function TransactionsPage() {
                   </div>
 
                   <div style={{ fontSize: "13px", fontWeight: 600, color: "#10b981", textAlign: "right" }}>
-                    {tx.amountEth} ETH
+                    {tx.amountEth} SOL
                   </div>
                 </div>
               ))}

@@ -93,9 +93,8 @@ function SetupContent() {
 
   return (
     <>
-      <Topbar />
       <div style={{ flex: 1, overflowY: "auto", padding: "0 40px 48px" }}>
-        <div style={{ marginBottom: "28px", marginTop: "12px" }}>
+        <div style={{ marginBottom: "28px", marginTop: "32px" }}>
           <h1 style={{ fontSize: "22px", fontWeight: 600, color: "#000", marginBottom: "6px" }}>Setup</h1>
           <p style={{ fontSize: "13px", color: "#71717a" }}>
             Connect a GitHub repository. When a PR is opened, GitPay reviews it and posts a claim link automatically.
@@ -159,12 +158,23 @@ function SetupContent() {
                     <div style={{ fontSize: "13px", fontWeight: 500, color: "#000" }}>GitHub connected</div>
                     <div style={{ fontSize: "12px", color: "#71717a" }}>{repos.length} repositories found</div>
                   </div>
-                  <button
-                    onClick={() => loadRepos()}
-                    style={{ marginLeft: "auto", padding: "5px 12px", border: "1px solid #e4e4e7", borderRadius: "6px", background: "#fff", fontSize: "12px", color: "#71717a", cursor: "pointer", fontFamily: "inherit" }}
-                  >
-                    Refresh
-                  </button>
+                  <div style={{ marginLeft: "auto", display: "flex", gap: "8px" }}>
+                    <button
+                      onClick={() => loadRepos()}
+                      style={{ padding: "5px 12px", border: "1px solid #e4e4e7", borderRadius: "6px", background: "#fff", fontSize: "12px", color: "#71717a", cursor: "pointer", fontFamily: "inherit" }}
+                    >
+                      Refresh
+                    </button>
+                    <button
+                      onClick={async () => {
+                        await fetch("/api/github/signout", { method: "POST" });
+                        window.location.href = "/setup";
+                      }}
+                      style={{ padding: "5px 12px", border: "1px solid #e4e4e7", borderRadius: "6px", background: "#fff", fontSize: "12px", color: "#71717a", cursor: "pointer", fontFamily: "inherit" }}
+                    >
+                      Sign out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

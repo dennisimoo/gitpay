@@ -84,16 +84,14 @@ export default function Overview() {
 
   return (
     <>
-      <Topbar />
-
       <div style={{ flex: 1, overflowY: "auto", padding: "0 40px 48px" }}>
         {/* Page header */}
-        <div style={{ marginBottom: "32px", marginTop: "12px" }}>
+        <div style={{ marginBottom: "32px", marginTop: "32px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
             <h1 style={{ fontSize: "22px", fontWeight: 600, color: "#000" }}>Overview</h1>
           </div>
           <p style={{ fontSize: "13px", color: "#71717a" }}>
-            PRs are reviewed automatically. Contributors get a link to claim ETH on Base Sepolia.
+            PRs are reviewed automatically. Contributors get a link to claim SOL on Solana.
           </p>
         </div>
 
