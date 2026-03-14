@@ -20,14 +20,12 @@ interface Claim {
   createdAt: string;
 }
 
-function scoreColor(s: number) {
-  if (s >= 60) return "#10b981";
-  if (s >= 30) return "#f59e0b";
-  return "#71717a";
+function solFromScore(score: number) {
+  return ((score / 100) * 0.05).toFixed(4);
 }
 
-function ethFromScore(score: number) {
-  return ((score / 100) * 0.002).toFixed(6);
+function isValidSolanaAddress(addr: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(addr);
 }
 
 export default function ClaimPage({ params }: { params: Promise<{ token: string }> }) {
@@ -51,8 +49,8 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
   }, [token]);
 
   const submit = async () => {
-    if (!wallet || !/^0x[0-9a-fA-F]{40}$/.test(wallet)) {
-      setError("Enter a valid Ethereum address (0x...)");
+    if (!wallet || !isValidSolanaAddress(wallet)) {
+      setError("Enter a valid Solana wallet address");
       return;
     }
     setClaiming(true);
@@ -86,7 +84,6 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff" }}>
         <div style={{ textAlign: "center", maxWidth: "360px", padding: "24px" }}>
-          <div style={{ fontSize: "32px", marginBottom: "16px" }}>🔍</div>
           <h1 style={{ fontSize: "18px", fontWeight: 600, color: "#000", marginBottom: "8px" }}>Claim not found</h1>
           <p style={{ fontSize: "13px", color: "#71717a" }}>This link may have expired or is invalid.</p>
         </div>
@@ -94,22 +91,23 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
     );
   }
 
-  const amountEth = ethFromScore(claim.score);
+  const amountSol = solFromScore(claim.score);
 
   return (
     <div style={{ minHeight: "100vh", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}>
       <div style={{ width: "100%", maxWidth: "460px" }}>
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px", justifyContent: "center" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2"  width="20" height="5" rx="2.5" fill="#000" />
-            <rect x="2" y="9"  width="13" height="5" rx="2.5" fill="#10b981" />
-            <rect x="2" y="16" width="20" height="5" rx="2.5" fill="#000" />
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="3.5" r="2" fill="#000" />
+            <circle cx="3.5" cy="14.5" r="2" fill="#000" />
+            <circle cx="14.5" cy="14.5" r="2" fill="#000" />
+            <line x1="9" y1="5.5" x2="3.5" y2="12.5" stroke="#000" strokeWidth="1.4" strokeLinecap="round" />
+            <line x1="9" y1="5.5" x2="14.5" y2="12.5" stroke="#000" strokeWidth="1.4" strokeLinecap="round" />
           </svg>
           <span style={{ fontSize: "15px", fontWeight: 600, color: "#000" }}>GitPay</span>
         </div>
 
-        {/* Card */}
         <div style={{ border: "1px solid #e4e4e7", borderRadius: "16px", overflow: "hidden", background: "#fff", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
           {/* PR info */}
           <div style={{ padding: "24px", borderBottom: "1px solid #e4e4e7" }}>
@@ -125,7 +123,7 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
                 <div style={{ fontSize: "12px", color: "#71717a" }}>eligible for reward</div>
               </div>
               <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                <div style={{ fontSize: "28px", fontWeight: 700, color: scoreColor(claim.score), fontVariantNumeric: "tabular-nums" }}>
+                <div style={{ fontSize: "28px", fontWeight: 700, color: "#000", fontVariantNumeric: "tabular-nums" }}>
                   {claim.score}
                 </div>
                 <div style={{ fontSize: "10px", color: "#a1a1aa" }}>/ 100</div>
@@ -155,19 +153,18 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
           <div style={{ padding: "20px 24px" }}>
             {result ? (
               <div style={{ textAlign: "center", padding: "8px 0" }}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
-                  <Check size={22} style={{ color: "#10b981" }} />
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#f4f4f5", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                  <Check size={22} style={{ color: "#000" }} />
                 </div>
                 <div style={{ fontSize: "15px", fontWeight: 600, color: "#000", marginBottom: "4px" }}>
-                  {result.amountEth} ETH sent!
+                  {result.amountEth} SOL sent!
                 </div>
                 <p style={{ fontSize: "12px", color: "#71717a", marginBottom: "14px" }}>
-                  Your reward is on its way on Base Sepolia.
+                  Your reward has been sent on Solana.
                 </p>
                 <a href={result.explorerUrl} target="_blank" rel="noreferrer"
-                  style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#3b82f6", fontWeight: 500, textDecoration: "none" }}>
-                  View transaction
-                  <ArrowUpRight size={12} />
+                  style={{ display: "inline-flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "#000", fontWeight: 500, textDecoration: "none" }}>
+                  View transaction <ExternalLink size={11} />
                 </a>
               </div>
             ) : claim.claimed ? (
@@ -177,29 +174,28 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
             ) : (
               <>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "6px", marginBottom: "16px" }}>
-                  <div style={{ fontSize: "24px", fontWeight: 700, color: "#000" }}>{amountEth} ETH</div>
-                  <div style={{ fontSize: "12px", color: "#71717a" }}>on Base Sepolia</div>
+                  <div style={{ fontSize: "24px", fontWeight: 700, color: "#000" }}>{amountSol} SOL</div>
+                  <div style={{ fontSize: "12px", color: "#71717a" }}>on Solana</div>
                 </div>
 
                 <div style={{ marginBottom: "12px" }}>
                   <label style={{ fontSize: "12px", fontWeight: 500, color: "#3f3f46", display: "block", marginBottom: "6px" }}>
-                    Your wallet address
+                    Your Solana wallet address
                   </label>
                   <input
                     type="text"
                     value={wallet}
                     onChange={(e) => { setWallet(e.target.value); setError(""); }}
-                    placeholder="0x..."
+                    placeholder="e.g. 6Eb99ybm26c97vLKXKYgFiUsksjVTyhzsDGQT2vT7CC7"
                     style={{
                       width: "100%", padding: "9px 12px", border: `1px solid ${error ? "#ef4444" : "#e4e4e7"}`,
-                      borderRadius: "8px", fontSize: "13px", fontFamily: "Geist Mono, monospace",
-                      outline: "none", color: "#000", background: "#fff",
+                      borderRadius: "8px", fontSize: "12px", fontFamily: "Geist Mono, monospace",
+                      outline: "none", color: "#000", background: "#fff", boxSizing: "border-box",
                     }}
                   />
                   {error && (
                     <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "6px", fontSize: "11px", color: "#ef4444" }}>
-                      <AlertCircle size={11} />
-                      {error}
+                      <AlertCircle size={11} /> {error}
                     </div>
                   )}
                 </div>
@@ -208,21 +204,20 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
                   onClick={submit}
                   disabled={claiming || !wallet}
                   style={{
-                    width: "100%", padding: "10px", background: claiming || !wallet ? "#f4f4f5" : "#000",
+                    width: "100%", padding: "10px",
+                    background: claiming || !wallet ? "#f4f4f5" : "#000",
                     color: claiming || !wallet ? "#a1a1aa" : "#fff",
                     border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: 500,
                     cursor: claiming || !wallet ? "not-allowed" : "pointer",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-                    fontFamily: "inherit", transition: "background 0.15s",
+                    fontFamily: "inherit",
                   }}
                 >
-                  {claiming ? (
-                    <><Loader2 size={15} style={{ animation: "spin 0.8s linear infinite" }} /> Sending...</>
-                  ) : "Claim reward"}
+                  {claiming ? <><Loader2 size={15} style={{ animation: "spin 0.8s linear infinite" }} /> Sending...</> : "Claim reward"}
                 </button>
 
                 <p style={{ fontSize: "11px", color: "#a1a1aa", marginTop: "10px", textAlign: "center" }}>
-                  Testnet ETH only. Your score of {claim.score}/100 earns {amountEth} ETH.
+                  Your score of {claim.score}/100 earns {amountSol} SOL.
                 </p>
               </>
             )}
@@ -230,13 +225,9 @@ export default function ClaimPage({ params }: { params: Promise<{ token: string 
         </div>
 
         <p style={{ textAlign: "center", fontSize: "11px", color: "#d4d4d8", marginTop: "20px" }}>
-          Powered by GitPay · AI scoring by Gemini · Base Sepolia
+          Powered by GitPay · AI scoring by Gemini · Solana
         </p>
       </div>
     </div>
   );
-}
-
-function ArrowUpRight({ size }: { size: number }) {
-  return <ExternalLink size={size} />;
 }

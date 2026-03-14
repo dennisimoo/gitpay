@@ -23,16 +23,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   }
 
   const { walletAddress } = await req.json() as { walletAddress: string };
-  if (!walletAddress || !/^0x[0-9a-fA-F]{40}$/.test(walletAddress)) {
-    return NextResponse.json({ error: "Invalid wallet address" }, { status: 400 });
+  if (!walletAddress || !/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(walletAddress)) {
+    return NextResponse.json({ error: "Invalid Solana wallet address" }, { status: 400 });
   }
 
-  // Calculate ETH amount — proportional to score, capped at 0.002 ETH per claim
-  const amountEth = ((claim.score / 100) * 0.002).toFixed(6);
+  // Calculate SOL amount — proportional to score, 0.05 SOL per 100 points
+  const amountEth = ((claim.score / 100) * 0.05).toFixed(6);
+
+  const EXPLORER_BASE = process.env.SOLANA_EXPLORER_BASE || "https://explorer.solana.com/tx";
+  const CLUSTER_PARAM = process.env.SOLANA_CLUSTER_PARAM || "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899";
 
   try {
     const txHash = await executePayout(walletAddress, amountEth);
-    const explorerUrl = `https://sepolia.basescan.org/tx/${txHash}`;
+    const explorerUrl = `${EXPLORER_BASE}/${txHash}${CLUSTER_PARAM}`;
 
     markClaimed(token, walletAddress, txHash, explorerUrl);
 
