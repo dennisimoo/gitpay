@@ -1,4 +1,18 @@
-import { db } from "./db";
+import PocketBase from "pocketbase";
+
+const PB_URL = process.env.POCKETBASE_URL || "https://gitpocket.blipz.live";
+const PB_EMAIL = process.env.POCKETBASE_ADMIN_EMAIL || "4dennisk@gmail.com";
+const PB_PASSWORD = process.env.POCKETBASE_ADMIN_PASSWORD || "denniskhy11";
+
+const g = global as typeof global & { _pb?: PocketBase };
+
+async function pb(): Promise<PocketBase> {
+  if (!g._pb) g._pb = new PocketBase(PB_URL);
+  if (!g._pb.authStore.isValid) {
+    await g._pb.collection("_superusers").authWithPassword(PB_EMAIL, PB_PASSWORD);
+  }
+  return g._pb;
+}
 
 export interface Claim {
   token: string;
@@ -29,7 +43,7 @@ export interface Transaction {
   timestamp: string;
 }
 
-function rowToClaim(r: Record<string, unknown>): Claim {
+function toClaim(r: Record<string, unknown>): Claim {
   return {
     token: r.token as string,
     githubUsername: r.github_username as string,
@@ -44,78 +58,163 @@ function rowToClaim(r: Record<string, unknown>): Claim {
     claimed: Boolean(r.claimed),
     txHash: (r.tx_hash as string) || undefined,
     explorerUrl: (r.explorer_url as string) || undefined,
-    createdAt: r.created_at as string,
+    createdAt: (r.created_at as string) || (r.created as string),
   };
 }
 
-function rowToTx(r: Record<string, unknown>): Transaction {
+function toTx(r: Record<string, unknown>): Transaction {
   return {
     txHash: r.tx_hash as string,
     explorerUrl: r.explorer_url as string,
     githubUsername: r.github_username as string,
     walletAddress: r.wallet_address as string,
-    amountEth: r.amount_eth as string,
+    amountEth: (r.amount_sol as string) || (r.amount_eth as string),
     score: r.score as number,
     repo: r.repo as string,
     prUrl: r.pr_url as string,
-    timestamp: r.timestamp as string,
+    timestamp: (r.timestamp as string) || (r.created as string),
   };
 }
 
-export function addClaim(claim: Claim): void {
-  db.prepare(`
-    INSERT OR REPLACE INTO claims
-    (token, github_username, repo, pr_number, pr_url, pr_title, score, reasoning, category, wallet_address, claimed, tx_hash, explorer_url, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    claim.token, claim.githubUsername, claim.repo, claim.prNumber,
-    claim.prUrl, claim.prTitle, claim.score, claim.reasoning, claim.category,
-    claim.walletAddress ?? null, claim.claimed ? 1 : 0,
-    claim.txHash ?? null, claim.explorerUrl ?? null, claim.createdAt
-  );
+export async function addClaim(claim: Claim): Promise<void> {
+  const client = await pb();
+  await client.collection("claims").create({
+    token: claim.token,
+    github_username: claim.githubUsername,
+    repo: claim.repo,
+    pr_number: claim.prNumber,
+    pr_url: claim.prUrl,
+    pr_title: claim.prTitle,
+    score: claim.score,
+    reasoning: claim.reasoning,
+    category: claim.category,
+    claimed: claim.claimed,
+    tx_hash: claim.txHash || "",
+    explorer_url: claim.explorerUrl || "",
+    created_at: claim.createdAt,
+  });
 }
 
-export function getClaim(token: string): Claim | undefined {
-  const row = db.prepare("SELECT * FROM claims WHERE token = ?").get(token);
-  return row ? rowToClaim(row as Record<string, unknown>) : undefined;
+export async function getClaim(token: string): Promise<Claim | undefined> {
+  try {
+    const client = await pb();
+    const res = await client.collection("claims").getList(1, 1, { filter: `token = "${token}"` });
+    return res.items.length ? toClaim(res.items[0] as unknown as Record<string, unknown>) : undefined;
+  } catch { return undefined; }
 }
 
-export function markClaimed(token: string, walletAddress: string, txHash: string, explorerUrl: string): void {
-  db.prepare(`
-    UPDATE claims SET claimed = 1, wallet_address = ?, tx_hash = ?, explorer_url = ? WHERE token = ?
-  `).run(walletAddress, txHash, explorerUrl, token);
+export async function getClaimByPR(repo: string, prNumber: number): Promise<Claim | undefined> {
+  try {
+    const client = await pb();
+    const res = await client.collection("claims").getList(1, 1, {
+      filter: `repo = "${repo.replace(/"/g, '\\"')}" && pr_number = ${prNumber}`,
+    });
+    return res.items.length ? toClaim(res.items[0] as unknown as Record<string, unknown>) : undefined;
+  } catch { return undefined; }
 }
 
-export function addTransaction(tx: Transaction): void {
-  db.prepare(`
-    INSERT OR REPLACE INTO transactions
-    (tx_hash, explorer_url, github_username, wallet_address, amount_eth, score, repo, pr_url, timestamp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(
-    tx.txHash, tx.explorerUrl, tx.githubUsername, tx.walletAddress,
-    tx.amountEth, tx.score, tx.repo, tx.prUrl, tx.timestamp
-  );
+export async function markClaimed(token: string, walletAddress: string, txHash: string, explorerUrl: string): Promise<void> {
+  const client = await pb();
+  const res = await client.collection("claims").getList(1, 1, { filter: `token = "${token}"` });
+  if (!res.items.length) return;
+  await client.collection("claims").update(res.items[0].id, {
+    claimed: true, wallet_address: walletAddress, tx_hash: txHash, explorer_url: explorerUrl,
+  });
 }
 
-export function getAllClaims(): Claim[] {
-  const rows = db.prepare("SELECT * FROM claims ORDER BY created_at DESC").all();
-  return rows.map((r) => rowToClaim(r as Record<string, unknown>));
+export async function addTransaction(tx: Transaction): Promise<void> {
+  const client = await pb();
+  await client.collection("transactions").create({
+    tx_hash: tx.txHash,
+    explorer_url: tx.explorerUrl,
+    github_username: tx.githubUsername,
+    wallet_address: tx.walletAddress,
+    amount_sol: tx.amountEth,
+    score: tx.score,
+    repo: tx.repo,
+    pr_url: tx.prUrl,
+    timestamp: tx.timestamp,
+  });
 }
 
-export const transactions = {
-  get all() {
-    return db.prepare("SELECT * FROM transactions ORDER BY timestamp DESC").all().map((r) => rowToTx(r as Record<string, unknown>));
-  }
-};
+export async function getAllClaims(): Promise<Claim[]> {
+  const client = await pb();
+  const records = await client.collection("claims").getFullList({ sort: "-created" });
+  return records.map((r) => toClaim(r as unknown as Record<string, unknown>));
+}
 
-export function getStats() {
-  const all = getAllClaims();
+export async function getAllTransactions(): Promise<Transaction[]> {
+  const client = await pb();
+  const records = await client.collection("transactions").getFullList({ sort: "-created" });
+  return records.map((r) => toTx(r as unknown as Record<string, unknown>));
+}
+
+export async function getStats() {
+  const all = await getAllClaims();
   return {
     total: all.length,
     claimed: all.filter((c) => c.claimed).length,
     pending: all.filter((c) => !c.claimed).length,
     avgScore: all.length ? Math.round(all.reduce((s, c) => s + c.score, 0) / all.length) : 0,
   };
+}
+
+export async function kvSet(key: string, value: string): Promise<void> {
+  const client = await pb();
+  const res = await client.collection("kv").getList(1, 1, { filter: `key = "${key}"` }).catch(() => ({ items: [] as unknown[] }));
+  if (res.items.length > 0) {
+    await client.collection("kv").update((res.items[0] as { id: string }).id, { value });
+  } else {
+    await client.collection("kv").create({ key, value });
+  }
+}
+
+export async function kvGet(key: string): Promise<string | undefined> {
+  try {
+    const client = await pb();
+    const res = await client.collection("kv").getList(1, 1, { filter: `key = "${key}"` });
+    return res.items.length ? (res.items[0] as unknown as Record<string, unknown>).value as string : undefined;
+  } catch { return undefined; }
+}
+
+export async function getConnectedRepos(sessionId: string): Promise<string[]> {
+  try {
+    const client = await pb();
+    const records = await client.collection("connected_repos").getFullList({ filter: `session_id = "${sessionId}"` });
+    return records.map((r) => (r as unknown as Record<string, unknown>).repo_full_name as string);
+  } catch { return []; }
+}
+
+export async function addConnectedRepo(repoFullName: string, sessionId: string): Promise<void> {
+  const client = await pb();
+  const res = await client.collection("connected_repos").getList(1, 1, {
+    filter: `repo_full_name = "${repoFullName.replace(/"/g, '\\"')}" && session_id = "${sessionId}"`,
+  }).catch(() => ({ items: [] as unknown[] }));
+  if (!res.items.length) {
+    await client.collection("connected_repos").create({ repo_full_name: repoFullName, session_id: sessionId });
+  }
+}
+
+export async function removeConnectedRepo(repoFullName: string, sessionId: string): Promise<void> {
+  try {
+    const client = await pb();
+    const res = await client.collection("connected_repos").getList(1, 1, {
+      filter: `repo_full_name = "${repoFullName.replace(/"/g, '\\"')}" && session_id = "${sessionId}"`,
+    });
+    if (res.items.length) await client.collection("connected_repos").delete(res.items[0].id);
+  } catch { /* ignore */ }
+}
+
+export async function getTokenForRepo(repoFullName: string): Promise<string | undefined> {
+  try {
+    const client = await pb();
+    const res = await client.collection("connected_repos").getList(1, 1, {
+      filter: `repo_full_name = "${repoFullName.replace(/"/g, '\\"')}"`,
+    });
+    if (!res.items.length) return undefined;
+    const sessionId = (res.items[0] as unknown as Record<string, unknown>).session_id as string;
+    return kvGet(`github_token:${sessionId}`);
+  } catch { return undefined; }
 }
 
 export interface LeaderboardEntry {
@@ -126,84 +225,25 @@ export interface LeaderboardEntry {
   flagged: boolean;
 }
 
-export function getLeaderboard(): LeaderboardEntry[] {
-  const all = getAllClaims();
-  const txs = db.prepare("SELECT * FROM transactions").all().map((r) => rowToTx(r as Record<string, unknown>));
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  const [all, txs] = await Promise.all([getAllClaims(), getAllTransactions()]);
   const map = new Map<string, LeaderboardEntry>();
   for (const claim of all) {
-    const existing = map.get(claim.githubUsername);
-    if (existing) {
-      existing.totalScore += claim.score;
-      if (claim.walletAddress) existing.walletAddress = claim.walletAddress;
+    const e = map.get(claim.githubUsername);
+    if (e) {
+      e.totalScore += claim.score;
+      if (claim.walletAddress) e.walletAddress = claim.walletAddress;
     } else {
-      map.set(claim.githubUsername, {
-        githubUsername: claim.githubUsername,
-        totalScore: claim.score,
-        totalPaidOut: 0,
-        walletAddress: claim.walletAddress,
-        flagged: false,
-      });
+      map.set(claim.githubUsername, { githubUsername: claim.githubUsername, totalScore: claim.score, totalPaidOut: 0, walletAddress: claim.walletAddress, flagged: false });
     }
   }
   for (const tx of txs) {
-    const entry = map.get(tx.githubUsername);
-    if (entry) entry.totalPaidOut += parseFloat(tx.amountEth) * 1000;
+    const e = map.get(tx.githubUsername);
+    if (e) e.totalPaidOut += parseFloat(tx.amountEth) * 1000;
   }
   return Array.from(map.values()).sort((a, b) => b.totalScore - a.totalScore);
 }
 
-export function getTreasuryStats() {
+export async function getTreasuryStats() {
   return getStats();
-}
-
-export function getRecentContributionCount(username: string, windowMs: number): number {
-  const cutoff = new Date(Date.now() - windowMs).toISOString();
-  const row = db.prepare(
-    "SELECT COUNT(*) as cnt FROM claims WHERE github_username = ? AND created_at > ?"
-  ).get(username, cutoff) as { cnt: number };
-  return row.cnt;
-}
-
-export function getRecentScores(username: string, last: number): number[] {
-  const rows = db.prepare(
-    "SELECT score FROM claims WHERE github_username = ? ORDER BY created_at DESC LIMIT ?"
-  ).all(username, last) as { score: number }[];
-  return rows.map((r) => r.score);
-}
-
-export function recordTransaction(tx: Omit<Transaction, "explorerUrl" | "score" | "repo" | "prUrl"> & { scoreRedeemed?: number }): void {
-  addTransaction({
-    txHash: tx.txHash,
-    explorerUrl: `https://solscan.io/tx/${tx.txHash}`,
-    githubUsername: tx.githubUsername,
-    walletAddress: tx.walletAddress,
-    amountEth: tx.amountEth,
-    score: tx.scoreRedeemed ?? 0,
-    repo: "",
-    prUrl: "",
-    timestamp: tx.timestamp,
-  });
-}
-
-// KV helpers for github token
-export function kvSet(key: string, value: string): void {
-  db.prepare("INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)").run(key, value);
-}
-
-export function kvGet(key: string): string | undefined {
-  const row = db.prepare("SELECT value FROM kv WHERE key = ?").get(key) as { value: string } | undefined;
-  return row?.value;
-}
-
-// Connected repos
-export function getConnectedRepos(): string[] {
-  return (db.prepare("SELECT repo_full_name FROM connected_repos").all() as { repo_full_name: string }[]).map((r) => r.repo_full_name);
-}
-
-export function addConnectedRepo(repoFullName: string): void {
-  db.prepare("INSERT OR IGNORE INTO connected_repos (repo_full_name) VALUES (?)").run(repoFullName);
-}
-
-export function removeConnectedRepo(repoFullName: string): void {
-  db.prepare("DELETE FROM connected_repos WHERE repo_full_name = ?").run(repoFullName);
 }
