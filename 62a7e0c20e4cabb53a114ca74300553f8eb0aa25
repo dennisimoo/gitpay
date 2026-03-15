@@ -1,0 +1,25 @@
+src/lib/anomaly.ts
+  67fcfcd1402377fc 8,13,20
+src/app/api/github/repos/route.ts
+  67fcfcd1402377fc 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "62a7e0c20e4cabb53a114ca74300553f8eb0aa25",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 30,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
