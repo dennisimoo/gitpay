@@ -1,0 +1,31 @@
+src/middleware.ts
+  67fcfcd1402377fc 1-19
+src/app/login/page.tsx
+  67fcfcd1402377fc 1-154
+src/lib/session.ts
+  67fcfcd1402377fc 3,9-10,18-20
+src/app/api/github/callback/route.ts
+  67fcfcd1402377fc 3,9,11,13,21-23,26-38
+src/app/api/github/signout/route.ts
+  67fcfcd1402377fc 2,16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "2a57b74b4ccc6e996099fccb6995ab74f9a018d2",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 243,
+      "total_deletions": 62,
+      "accepted_lines": 203,
+      "overriden_lines": 0
+    }
+  }
+}
