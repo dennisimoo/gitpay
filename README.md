@@ -12,6 +12,10 @@ GitPay connects to your GitHub repositories, uses AI to score every pull request
 - **Leaderboard** — Track top contributors across all your repos
 - **Dashboard** — See all PRs, scores, and transaction history in one place
 
+## Contributing
+
+PRs welcome. GitPay will score your contribution automatically.
+
 ## Getting Started
 
 1. Sign in with GitHub at [gitpay.blipz.live](https://gitpay.blipz.live)
