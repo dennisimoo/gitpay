@@ -10,6 +10,7 @@
   "dependencies": {
     "@octokit/rest": "^21.0.2",
     "@solana/web3.js": "^1.98.4",
+    "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^12.36.0",
     "lucide-react": "^0.441.0",
@@ -17,7 +18,8 @@
     "pocketbase": "^0.26.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "replicate": "^1.0.1"
+    "replicate": "^1.0.1",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",
