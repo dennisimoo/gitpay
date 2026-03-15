@@ -22,3 +22,4 @@ PRs welcome. GitPay will score your contribution automatically.
 2. Go to **Setup** and connect your repositories
 3. GitPay installs a webhook automatically
 4. When contributors open PRs, they get scored and receive a claim link in the comments
+.
