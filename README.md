@@ -14,7 +14,7 @@ GitPay connects to your GitHub repositories, uses AI to score every pull request
 
 ## Contributing
 
-PRs welcome. GitPay will score your contribution automatically.
+PRs welcome. GitPay automatically scores and rewards your contribution.
 
 ## Getting Started
 
