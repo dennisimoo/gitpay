@@ -7,7 +7,10 @@ const PB_PASSWORD = process.env.POCKETBASE_ADMIN_PASSWORD!;
 const g = global as typeof global & { _pb?: PocketBase };
 
 async function pb(): Promise<PocketBase> {
-  if (!g._pb) g._pb = new PocketBase(PB_URL);
+  if (!g._pb) {
+    g._pb = new PocketBase(PB_URL);
+    g._pb.autoCancellation(false);
+  }
   if (!g._pb.authStore.isValid) {
     await g._pb.collection("_superusers").authWithPassword(PB_EMAIL, PB_PASSWORD);
   }
