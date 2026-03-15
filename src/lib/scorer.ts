@@ -45,7 +45,6 @@ Respond with ONLY this JSON (no markdown, no code fences):
         input: {
           prompt,
           temperature: 0.2,
-          max_output_tokens: 300,
         },
       });
 
