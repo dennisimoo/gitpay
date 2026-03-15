@@ -1,20 +1,20 @@
 # GitPay
 
-Autonomous GitHub contribution rewards on Solana.
+> Autonomous rewards for open source contributors on Solana
 
-GitPay watches your repositories for merged pull requests, scores them with AI, and pays contributors in SOL automatically.
+GitPay connects to your GitHub repositories, uses AI to score every pull request, and automatically pays contributors in SOL — no manual review, no spreadsheets.
 
-## How it works
+## Features
 
-1. Connect your GitHub org via OAuth
-2. GitPay installs a webhook on your repositories
-3. When a PR is merged, Gemini scores it on quality and impact
-4. Contributors claim their SOL reward via a unique link posted in the PR comments
+- **AI Scoring** — Every PR is graded by Gemini on quality, complexity, and impact
+- **Instant Payouts** — Contributors claim SOL directly to their wallet via a unique link
+- **Zero Config** — Install a webhook and the rest is automatic
+- **Leaderboard** — Track top contributors across all your repos
+- **Dashboard** — See all PRs, scores, and transaction history in one place
 
-## Stack
+## Getting Started
 
-- Next.js 16 (App Router)
-- PocketBase (persistence)
-- Solana devnet (payouts)
-- Gemini (AI scoring)
-- GitHub OAuth + Webhooks
+1. Sign in with GitHub at [gitpay.blipz.live](https://gitpay.blipz.live)
+2. Go to **Setup** and connect your repositories
+3. GitPay installs a webhook automatically
+4. When contributors open PRs, they get scored and receive a claim link in the comments
