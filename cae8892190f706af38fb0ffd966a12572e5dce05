@@ -1,0 +1,37 @@
+src/app/api/github/callback/route.ts
+  67fcfcd1402377fc 28
+src/app/api/github/signout/route.ts
+  67fcfcd1402377fc 11-12,14
+src/lib/store.ts
+  67fcfcd1402377fc 1,3-15,46,61,65,71,75,79-95,98-125,128-140,143-146,149-152,155-156,165-222,233-234,237-240,242,246-247
+src/app/api/webhook/route.ts
+  67fcfcd1402377fc 11,14,69,74,81,101,107
+src/app/api/claims/route.ts
+  67fcfcd1402377fc 7-8
+src/app/api/transactions/route.ts
+  67fcfcd1402377fc 2,7-8
+src/app/api/claim/[token]/route.ts
+  67fcfcd1402377fc 10,17,30,32,35,38-39,44,51-52
+src/app/api/github/install-webhook/route.ts
+  67fcfcd1402377fc 6,12,29,48,54,59,83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "cae8892190f706af38fb0ffd966a12572e5dce05",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 192,
+      "total_deletions": 193,
+      "accepted_lines": 191,
+      "overriden_lines": 0
+    }
+  }
+}
