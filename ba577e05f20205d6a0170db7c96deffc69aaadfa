@@ -1,0 +1,37 @@
+src/app/api/github/callback/route.ts
+  67fcfcd1402377fc 37
+src/components/Sidebar.tsx
+  67fcfcd1402377fc 6,28,51,89-91,93-96,102,104-122
+src/app/(app)/prs/page.tsx
+  67fcfcd1402377fc 6,29-44,51,55,70-102,106-117,175,181
+src/app/login/page.tsx
+  67fcfcd1402377fc 7,9-13,31,35-36,40,54,56
+src/lib/store.ts
+  67fcfcd1402377fc 3-5
+src/lib/github.ts
+  67fcfcd1402377fc 56-57,59,61,65
+src/app/icon.svg
+  67fcfcd1402377fc 1-13
+src/app/globals.css
+  67fcfcd1402377fc 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "ba577e05f20205d6a0170db7c96deffc69aaadfa",
+  "prompts": {
+    "67fcfcd1402377fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6e207f3-ae68-4b39-9321-2d1cccd344f0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "randomperson12344 <4dennisk@gmail.com>",
+      "messages": [],
+      "total_additions": 370,
+      "total_deletions": 315,
+      "accepted_lines": 151,
+      "overriden_lines": 0
+    }
+  }
+}
