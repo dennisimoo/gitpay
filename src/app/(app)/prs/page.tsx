@@ -118,6 +118,7 @@ function PRRow({ c, appUrl, isLast }: { c: Claim; appUrl: string; isLast: boolea
 export default function PRsPage() {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [filter, setFilter] = useState<"all" | "pending" | "claimed">("all");
+  const [search, setSearch] = useState("");
 
   const load = async () => {
     try {
@@ -143,37 +144,72 @@ export default function PRsPage() {
   }, []);
 
   const filtered = claims.filter((c) => {
-    if (filter === "pending") return !c.claimed;
-    if (filter === "claimed") return c.claimed;
+    if (filter === "pending" && c.claimed) return false;
+    if (filter === "claimed" && !c.claimed) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return c.githubUsername.toLowerCase().includes(q) || c.repo.toLowerCase().includes(q) || c.prTitle.toLowerCase().includes(q);
+    }
     return true;
   });
 
+  const avgScore = claims.length ? Math.round(claims.reduce((s, c) => s + c.score, 0) / claims.length) : 0;
   const appUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
     <>
       <Topbar />
       <div style={{ flex: 1, overflowY: "auto", padding: "28px 40px 48px" }}>
-        <div style={{ display: "flex", gap: "4px", marginBottom: "20px" }}>
-          {(["all", "pending", "claimed"] as const).map((f) => (
-            <button key={f} onClick={() => setFilter(f)} style={{
-              padding: "6px 14px", borderRadius: "7px", border: "1px solid",
-              borderColor: filter === f ? "#000" : "#e4e4e7",
-              background: filter === f ? "#000" : "#fff",
-              color: filter === f ? "#fff" : "#71717a",
-              fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
-              textTransform: "capitalize",
-            }}>
-              {f}
-            </button>
-          ))}
+
+        {/* Stats row */}
+        {claims.length > 0 && (
+          <div style={{ display: "flex", gap: "12px", marginBottom: "24px", maxWidth: "800px" }}>
+            {[
+              { label: "Total PRs", value: claims.length },
+              { label: "Pending", value: claims.filter(c => !c.claimed).length },
+              { label: "Claimed", value: claims.filter(c => c.claimed).length },
+              { label: "Avg Score", value: avgScore },
+            ].map(({ label, value }) => (
+              <div key={label} style={{ flex: 1, border: "1px solid #e4e4e7", borderRadius: "10px", padding: "12px 16px" }}>
+                <div style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: 500, marginBottom: "4px" }}>{label}</div>
+                <div style={{ fontSize: "20px", fontWeight: 700, color: "#000" }}>{value}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Toolbar */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "16px", maxWidth: "800px" }}>
+          <div style={{ display: "flex", gap: "4px" }}>
+            {(["all", "pending", "claimed"] as const).map((f) => (
+              <button key={f} onClick={() => setFilter(f)} style={{
+                padding: "6px 14px", borderRadius: "7px", border: "1px solid",
+                borderColor: filter === f ? "#000" : "#e4e4e7",
+                background: filter === f ? "#000" : "#fff",
+                color: filter === f ? "#fff" : "#71717a",
+                fontSize: "12px", fontWeight: 500, cursor: "pointer", fontFamily: "inherit",
+                textTransform: "capitalize",
+              }}>
+                {f}
+              </button>
+            ))}
+          </div>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by contributor, repo, or title…"
+            style={{
+              flex: 1, padding: "6px 12px", border: "1px solid #e4e4e7", borderRadius: "7px",
+              fontSize: "12px", fontFamily: "inherit", color: "#000", outline: "none", background: "#fff",
+            }}
+          />
         </div>
 
         <div style={{ maxWidth: "800px" }}>
           {filtered.length === 0 ? (
             <div style={{ border: "1px dashed #e4e4e7", borderRadius: "12px", padding: "48px 24px", textAlign: "center" }}>
               <GitMerge size={28} strokeWidth={1.5} color="#d4d4d8" style={{ display: "inline-block", marginBottom: "10px" }} />
-              <p style={{ fontSize: "14px", color: "#71717a" }}>No pull requests yet</p>
+              <p style={{ fontSize: "14px", color: "#71717a" }}>{search ? "No results matched your search" : "No pull requests yet"}</p>
             </div>
           ) : (
             <div style={{ border: "1px solid #e4e4e7", borderRadius: "12px", overflow: "hidden" }}>
