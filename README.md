@@ -25,4 +25,6 @@ PRs welcome. GitPay will score your contribution automatically.
 
 ## FAQ
 
-**What chains are supported?** Solana devnet.
+**What chains are supported?** Solana (devnet for testing, mainnet coming soon).
+
+**Is it free?** Yes, GitPay takes no fees — contributors receive the full reward.
