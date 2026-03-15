@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
     client_id: clientId,
     scope: "repo admin:repo_hook",
     state,
-    redirect_uri: `${origin}/api/github/callback`,
   });
 
   return NextResponse.redirect(`https://github.com/login/oauth/authorize?${params}`);
